@@ -71,6 +71,9 @@ df_filtrado = df[
     & (df["no_regiao_brasil"].isin(regioes_selecionadas))
 ]
 
+df_pns = carregar_dados_pns()
+
+
 # ============================================================
 # Cabeçalho
 # ============================================================
@@ -83,9 +86,31 @@ st.markdown(
     " do rastreamento após a pandemia."
 )
 
-home, tab1, tab2, tab3, tab4 = st.tabs(["Início", "Visualização Geográfica", "Infraestrutura e Recursos", "Impacto da pandemia", "Falta de exames"])
+home, tab1, tab2, tab3, tab4 = st.tabs(["🏠 Início", "🗺️ Visualização Geográfica", "💲Infraestrutura e Recursos", "💉Impacto da pandemia", "📊 Ausência de exames"])
 
 with home:
+    st.markdown(
+        "O câncer de colo do útero e o de mama podem ser detectados precocemente por exames de rastreamento, " \
+        "mas o resultado depende também de uma rede de serviços capaz de confirmar o diagnóstico e iniciar o tratamento." \
+        " Este painel apresenta uma análise visual e interativa dessa realidade no Brasil, voltada a gestores de saúde" \
+        " municipais e estaduais que precisam decidir onde investir em rastreamento e na habilitação de novos serviços. " \
+        
+        "A análise também permite identificar estados com vazios assistenciais e comparar o ritmo de recuperação entre as regiões."
+    )
+    st.markdown(
+        "O conjunto de dados reúne oito indicadores municipais do " \
+        "Ministério da Saúde (Portal de Dados Abertos do SUS), de 2016 a 2025: exames citopatológicos, mamografias, hospitais " \
+        "habilitados em alta complexidade, hospitais com licença PERSUS, laboratórios habilitados no QualiCito, recursos " \
+        "de radioterapia e serviços de diagnóstico de mama e de colo do útero. Entre as perguntas levantadas exploramos se " \
+        "os estados com recurso de radioterapia rastreiam mais, se a infraestrutura especializada cresceu de forma uniforme entre os estados" \
+        " além de investigar se o rastreamento já se recuperou do choque de 2020 devido à pandemia de Covid-19." \
+    )
+
+    st.markdown(
+        "As análises foram divididas de acordo com temas em comum nas categorias: **Visualização Geográfica**, " \
+        " **Infraestrutura e Recursos**, **Impacto da pandemia** e **Ausência de exames**." \
+    )
+
     st.header("Resumo do período selecionado")
     st.markdown(
         "O painel permite explorar os dados de 2016 a 2025, mas o período da barra lateral "
@@ -93,7 +118,7 @@ with home:
         "de exames e da presença de infraestrutura especializada nos estados, considerando "
         "apenas os anos e regiões selecionados."
     )
-
+    
     resumo = (
         df_filtrado.groupby("sg_uf")[list(CATEGORIAS.keys())].sum().reset_index()
         .assign(
@@ -108,10 +133,6 @@ with home:
     col1.metric("Exames citopatológicos", fmt_milhar(resumo["exames_cito"].sum()))
     col2.metric("Mamografias", fmt_milhar(resumo["mamografias"].sum()))
     col3.metric("Estados com as 3 infraestruturas habilitadas", f"{(resumo['total_infra'] == 3).sum()} de {len(resumo)}")
-
-    st.markdown(
-        "To-Do: Adicionar mais algumas informações/resumo sobre o assunto e linkar as perguntas e temas de cada aba."
-    )
 
 
 with tab1:
@@ -144,6 +165,37 @@ with tab1:
         "período e região da barra lateral."
     )
 
+    fig_mamografia, fig_exames = gera_grafico_pns(df_pns)
+
+    st.header("Dados complementares")
+    st.markdown(
+        "O painel também apresenta dados da Pesquisa Nacional de Saúde (PNS) 2019, realizada pelo IBGE," \
+        " que traz informações sobre a realização de exames preventivos para câncer de colo do útero e mamografia." \
+        " Os gráficos abaixo mostram a quantidade de mulheres que realizaram os exames preventivos de colo de útero até 3 anos antes da pesquisa e" \
+        "do grupo de mulheres na faixa de 50 a 69 anos que nunca haviam realizado o exame de mamografia, divididos por região do Brasil."
+    )
+    st.markdown(
+        "As informações resultantes da PNS 2019 oferecem valiosos subsídios à formulação" \
+        " de políticas públicas nas áreas de promoção, vigilância e atenção à saúde do SUS," \
+        " fomentando, assim, a resposta e o monitoramento de indicadores. "
+    )
+
+    colA, colB = st.columns(2)
+    with colA:
+        st.plotly_chart(
+                fig_mamografia,
+                width="stretch",
+            )
+
+    with colB:
+        st.plotly_chart(
+            fig_exames,
+            width="stretch",
+        )
+    
+    st.caption(
+        f"Fonte: IBGE - PNS (Pesquisa Nacional de Saúde). Didsponíveis no Sistema IBGE de Recuperação Automática - SIDRA, através da pesquisa do ano de 2019."
+    )
 with tab2:
     # ============================================================
     # View 2 — Pergunta 5 (nova): recurso de radioterapia está associado a mais rastreamento?

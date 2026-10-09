@@ -100,3 +100,21 @@ df = carregar_dados()
 
 ANO_MIN, ANO_MAX = int(df["ano"].min()), int(df["ano"].max())
 REGIOES = sorted(df["no_regiao_brasil"].dropna().unique())
+
+
+# Dados da Pesquisa Nacional de Saúde (PNS) 2019, que não estão no dataset principal, mas são usados em algumas análises
+# Mulheres de 25 a 64 anos de idade que realizaram o exame preventivo para câncer de colo de útero nos últimos 3 anos anteriores à pesquisa
+# Mulheres selecionadas de 50 a 69 anos de idade que nunca realizaram exame de mamografia
+def carregar_dados_pns():
+    # 1. Ler os arquivos CSV
+    df_mamo = pd.read_csv('dados_pns/nenhum_exame_mamografia.csv', sep=';', encoding='utf-8-sig')
+    df_exames = pd.read_csv('dados_pns/exames_colo_utero.csv', sep=';', encoding='utf-8-sig')
+
+    # 2. Renomear a coluna 'total' de cada um para identificar a categoria
+    df_mamo = df_mamo.rename(columns={'mulheres_sem_exames': 'mamografia'})
+    df_exames = df_exames.rename(columns={'exames_colo': 'exames_colo'})
+
+    # 3. Unir os DataFrames pela coluna 'regiao'
+    df_final = pd.merge(df_mamo, df_exames, on='regiao', how='outer').fillna(0)
+
+    return df_final

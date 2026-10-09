@@ -213,3 +213,49 @@ def get_grafico_vazios(vazios, ordem_vazios):
         )
         .properties(height=max(400, 18 * len(vazios)))
     )
+
+def gera_grafico_pns(df):
+    # 1. Gerar o gráfico para exames de mamografia
+    fig_mamografia = px.bar(
+        df,
+        x='regiao',
+        y='mamografia',
+        color='regiao',
+        color_discrete_map=PALETA_REGIAO | {"Brasil": "#ccc"},  # Mapeia as cores de acordo com a paleta definida    
+        title='Mulheres selecionadas de 50 a 69 anos de idade que nunca realizaram exame de mamografia, por Região',
+        labels={
+            'regiao': 'Região',
+            'mamografia': 'Quantidade de mulheres sem exames',
+        },
+        text_auto=True
+    )
+
+    fig_mamografia.update_layout(
+        template='plotly_white',
+        xaxis_title='Região',
+        yaxis_title='Quantidade de mulheres sem exames'
+    )
+
+    # 2. Gerar o gráfico para exames de colo de útero
+    fig_exames = px.bar(
+        df,
+        x='regiao',
+        y='exames_colo',
+        color='regiao',
+        color_discrete_map=PALETA_REGIAO | {"Brasil": "#ccc"},  # Mapeia as cores de acordo com a paleta definida    
+        title='Mulheres de 25 a 64 anos de idade que realizaram o exame preventivo para câncer de colo de útero nos últimos 3 anos anteriores à pesquisa, por Região',
+        labels={
+            'regiao': 'Região',
+            'exames_colo': 'Mulheres que realizaram o exame nos últimos 3 anos',
+        },
+        text_auto=True
+    )
+
+    fig_exames.update_layout(
+        title_text='Mulheres de 25 a 64 anos de idade que realizaram o exame preventivo para câncer de colo de útero<br> nos últimos 3 anos anteriores à pesquisa, por Região',
+        template='plotly_white',
+        xaxis_title='Região',
+        yaxis_title='Quantidade de Exames'
+    )
+    
+    return fig_mamografia, fig_exames
