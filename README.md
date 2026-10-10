@@ -5,6 +5,8 @@ Atividade 02 — Dashboard interativo com Streamlit
 
 **Autores:** Yuri Espinosa e Gabriel Fernandes
 
+**Acesse o painel online:** [painel-prevencao-cancer-mama.streamlit.app](https://painel-prevencao-cancer-mama.streamlit.app/)
+
 Dashboard de continuidade da Atividade 01, voltado a gestores de saúde municipal ou
 estadual, que acompanha o rastreamento do câncer de colo do útero e de mama no Brasil
 entre 2016 e 2025. O painel é organizado em 5 abas e 7 views:
